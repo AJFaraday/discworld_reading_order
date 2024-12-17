@@ -10,11 +10,7 @@ describe OpenLibrary::Book do
     }
   end
   let(:book) do
-    OpenLibrary::Book.new(
-      double(
-        parsed_response: book_attributes
-      )
-    )
+    OpenLibrary::Book.new(book_attributes)
   end
 
   it "returns attributes by name" do
@@ -41,6 +37,51 @@ describe OpenLibrary::Book do
     )
 
     book.cover
+  end
+
+  describe "#discworld?" do
+    subject { book.discworld? }
+
+    context 'subjects include "Discworld (Imaginary place)"' do
+      let(:book_attributes) do
+        {
+          "title" => "The Colour of Magic",
+          "description" => "The first book",
+          "subject_people" => %w[ Rinsewind Twoflower ],
+          "covers" => [ 12345, 99999 ],
+          "subjects" => [ "Discworld (Imaginary place)" ]
+        }
+      end
+
+      it { should(be_truthy) }
+    end
+
+    context 'subjects do not include "Discworld (Imaginary place)"' do
+      let(:book_attributes) do
+        {
+          "title" => "The Colour of Magic",
+          "description" => "The first book",
+          "subject_people" => %w[ Rinsewind Twoflower ],
+          "covers" => [ 12345, 99999 ],
+          "subjects" => [ "other subject" ]
+        }
+      end
+
+      it { should(be_falsey) }
+    end
+
+    context 'no subjects are provided' do
+      let(:book_attributes) do
+        {
+          "title" => "The Colour of Magic",
+          "description" => "The first book",
+          "subject_people" => %w[ Rinsewind Twoflower ],
+          "covers" => [ 12345, 99999 ]
+        }
+      end
+
+      it { should(be_falsey) }
+    end
   end
 
   context "#save!" do

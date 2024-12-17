@@ -1,9 +1,9 @@
 class OpenLibrary::Book
-  ATTRIBUTES = %i[title description subject_people]
+  ATTRIBUTES = %i[title description subject_people subjects]
 
   # initialised using HTTParty::Response
-  def initialize(response)
-    @parsed_response = response.parsed_response
+  def initialize(parsed_response)
+    @parsed_response = parsed_response
   end
 
   def cover
@@ -18,6 +18,10 @@ class OpenLibrary::Book
     define_method(attribute) do
       @parsed_response[attribute.to_s]
     end
+  end
+
+  def discworld?
+    subjects&.include?("Discworld (Imaginary place)")
   end
 
   def save!
