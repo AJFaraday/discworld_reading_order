@@ -1,5 +1,19 @@
 class OpenLibrary::Book
-  ATTRIBUTES = %i[title description subject_people subjects]
+  ATTRIBUTES = %i[title subject_people subjects]
+  DISCWORLD_INDICATORS = [
+    "Discworld (Imaginary Place)",
+    "Discworld (Imaginary place)"
+  ]
+
+  EXCLUDED_BOOKS = [
+    "Miss Felicity Beedles The World Of Poo",
+    "The Art of the Discworld",
+    "The Science of Discworld",
+    "Where's My Cow?",
+    "The Globe",
+    "The folklore of Discworld",
+    "Strata"
+  ]
 
   # initialised using HTTParty::Response
   def initialize(parsed_response)
@@ -20,8 +34,22 @@ class OpenLibrary::Book
     end
   end
 
+  # Sanitize description, which is sometimes a hash
+  def description
+    desc = @parsed_response["description"]
+    desc.is_a?(Hash) ? desc["value"] : desc
+  end
+
   def discworld?
-    subjects&.include?("Discworld (Imaginary place)")
+    has_discworld_topic? &&
+      description.is_a?(String) &&
+      EXCLUDED_BOOKS.exclude?(title)
+  end
+
+  def has_discworld_topic?
+    DISCWORLD_INDICATORS.any? do |indicator|
+      subjects&.include?(indicator)
+    end
   end
 
   def save!

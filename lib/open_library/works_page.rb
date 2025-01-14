@@ -8,6 +8,8 @@ class OpenLibrary::WorksPage
   end
 
   def next_page
+    return if next_page_url.nil?
+
     OpenLibrary::Client.new.get_works_page(next_page_url)
   end
 
@@ -17,7 +19,17 @@ class OpenLibrary::WorksPage
     @books = @parsed_response["entries"].map do |entry|
       OpenLibrary::Book.new(entry)
     end
+  end
 
-    @books.select!(&:discworld?)
+  def import!
+    books.each do |book|
+      if book.discworld?
+        book.save!
+      else
+        puts "Could not import:"
+        puts book.title
+        puts book.subjects.inspect
+      end
+    end
   end
 end

@@ -19,6 +19,53 @@ describe OpenLibrary::Book do
     expect(book.subject_people).to eq(%w[ Rinsewind Twoflower ])
   end
 
+  describe "#description" do
+    context "is a string" do
+      let(:book_attributes) do
+        {
+          "title" => "The Colour of Magic",
+          "description" => "The first book",
+          "subject_people" => %w[ Rinsewind Twoflower ],
+          "covers" => [ 12345, 99999 ]
+        }
+      end
+
+      it "should return the provided description" do
+        expect(book.description).to eq("The first book")
+      end
+    end
+
+    context "is a hash" do
+      let(:book_attributes) do
+        {
+          "title" => "The Colour of Magic",
+          "description" => { "type" => "text", "value" => "The first book" },
+          "subject_people" => %w[ Rinsewind Twoflower ],
+          "covers" => [ 12345, 99999 ]
+        }
+      end
+
+      it "should return the provided value attribute" do
+        expect(book.description).to eq("The first book")
+      end
+    end
+
+    context "is nil" do
+      let(:book_attributes) do
+        {
+          "title" => "The Colour of Magic",
+          "description" => nil,
+          "subject_people" => %w[ Rinsewind Twoflower ],
+          "covers" => [ 12345, 99999 ]
+        }
+      end
+
+      it "should return nil" do
+        expect(book.description).to be_nil
+      end
+    end
+  end
+
   it "retrieves the thumbnail" do
     expect(HTTParty).to(
       receive(:get).with(
@@ -76,6 +123,33 @@ describe OpenLibrary::Book do
           "title" => "The Colour of Magic",
           "description" => "The first book",
           "subject_people" => %w[ Rinsewind Twoflower ],
+          "covers" => [ 12345, 99999 ]
+        }
+      end
+
+      it { should(be_falsey) }
+    end
+
+    context "no description is provided" do
+      let(:book_attributes) do
+        {
+          "title" => "Some other thing",
+          "subject_people" => %w[ Rinsewind Twoflower ],
+          "subjects" => [ "Discworld (Imaginary place)" ],
+          "covers" => [ 12345, 99999 ]
+        }
+      end
+
+      it { should(be_falsey) }
+    end
+
+    context "title is in list of excluded books" do
+      let(:book_attributes) do
+        {
+          "title" => "Where's My Cow?",
+          "description" => "is a book",
+          "subject_people" => %w[ Rinsewind Twoflower ],
+          "subjects" => [ "Discworld (Imaginary place)" ],
           "covers" => [ 12345, 99999 ]
         }
       end

@@ -43,15 +43,9 @@ describe OpenLibrary::WorksPage do
   describe "#books" do
     it "returns an array of OpenLibraray::Book" do
       expect(works_page.books).to be_a(Array)
-      expect(works_page.books.length).to eq(1)
+      expect(works_page.books.length).to eq(2)
       expect(works_page.books[0]).to be_a(OpenLibrary::Book)
       expect(works_page.books[0].title).to eq("Guards! Guards!")
-    end
-
-    it "rejects non-discworld books" do
-      works_page.books.each do |book|
-        expect(book).to be_discworld
-      end
     end
   end
 end
